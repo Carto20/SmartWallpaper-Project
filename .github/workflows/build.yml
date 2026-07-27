@@ -5,28 +5,49 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'zulu'
-      - name: Extract Source Code
+
+      - name: Generate Compilation Workspace
         run: |
           mkdir -p app/src/main/java/com/custom/smartwallpaper/service
-          mkdir -p app/src/main/java/com/custom/smartwallpaper/ui
           mkdir -p app/src/main/java/com/custom/smartwallpaper/receiver
-          echo "Building architecture from Source..."
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-      - name: Build Debug APK
+          mkdir -p app/src/main/java/com/custom/smartwallpaper/ui
+          mkdir -p app/src/main/java/com/custom/smartwallpaper/ui/views
+          
+          # فك وتوزيع الأكواد البرمجية داخل بيئة السيرفر
+          python3 -c '
+import os, re
+if os.path.exists("SmartWallpaper_Source.txt"):
+    with open("SmartWallpaper_Source.txt", "r", encoding="utf-8") as f: content = f.read()
+    def save(p, path):
+        m = re.search(p, content, re.DOTALL)
+        if m:
+            with open(path, "w", encoding="utf-8") as out: out.write(m.group(1).strip())
+    save(r"1\. FILE: AndroidManifest\.xml.*?\n(<\?xml.*?</manifest>)", "app/src/main/AndroidManifest.xml")
+    save(r"2\. FILE: AutomationReceiver\.java.*?\n(package com\.custom\.smartwallpaper\.receiver;.*?^})", "app/src/main/java/com/custom/smartwallpaper/receiver/AutomationReceiver.java")
+    save(r"3\. FILE: SmartWallpaperService\.java.*?\n(package com\.custom\.smartwallpaper\.service;.*?^})", "app/src/main/java/com/custom/smartwallpaper/service/SmartWallpaperService.java")
+    save(r"4\. FILE: AdvancedWallpaperRenderer\.java.*?\n(package com\.custom\.smartwallpaper\.service;.*?^})", "app/src/main/java/com/custom/smartwallpaper/service/AdvancedWallpaperRenderer.java")
+    save(r"5\. FILE: PreviewEditorActivity\.java.*?\n(package com\.custom\.smartwallpaper\.ui;.*?^})", "app/src/main/java/com/custom/smartwallpaper/ui/PreviewEditorActivity.java")
+    save(r"6\. FILE: ExecuteCommandHandlerActivity\.java.*?\n(package com\.custom\.smartwallpaper\.ui;.*?^})", "app/src/main/java/com/custom/smartwallpaper/ui/ExecuteCommandHandlerActivity.java")
+    save(r"7\. FILE: DebuggerActivity\.java.*?\n(package com\.custom\.smartwallpaper\.ui;.*?^})", "app/src/main/java/com/custom/smartwallpaper/ui/DebuggerActivity.java")
+    save(r"8\. FILE: AppSettingsActivity\.java.*?\n(package com\.custom\.smartwallpaper\.ui;.*?^})", "app/src/main/java/com/custom/smartwallpaper/ui/AppSettingsActivity.java")
+    save(r"9\. FILE: GridOverlayView\.java.*?\n(package com\.custom\.smartwallpaper\.ui\.views;.*?^})", "app/src/main/java/com/custom/smartwallpaper/ui/views/GridOverlayView.java")
+          '
+
+      - name: Force Gradle Wrapper Injection
         run: |
-          if [ -f gradlew ]; then
-            chmod +x gradlew
-            ./gradlew assembleDebug
-          else
-            echo "Skipping compilation on blank workspace"
-          fi
-      - name: Upload Finished APK
+          gradle wrapper --gradle-version 8.5
+          chmod +x gradlew
+
+      - name: Build Production Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload Finished APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: SmartWallpaper-v1-APK
