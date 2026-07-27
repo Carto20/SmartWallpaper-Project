@@ -21,7 +21,6 @@
         <activity android:name="com.custom.smartwallpaper.ui.ExecuteCommandHandlerActivity" android:exported="true" />
         <activity android:name="com.custom.smartwallpaper.ui.PreviewEditorActivity" android:exported="true" />
         <activity android:name="com.custom.smartwallpaper.ui.DebuggerActivity" android:exported="true" />
-        <activity android:name="com.custom.smartwallpaper.ui.AiAssistantActivity" android:exported="true" />
         <activity android:name="com.custom.smartwallpaper.ui.AppSettingsActivity" android:exported="true" />
 
         <service
