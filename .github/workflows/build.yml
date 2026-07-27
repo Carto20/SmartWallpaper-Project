@@ -12,6 +12,32 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
 
+      - name: Extract Project Structuring
+        run: |
+          mkdir -p app/src/main/java/com/custom/smartwallpaper/service
+          mkdir -p app/src/main/java/com/custom/smartwallpaper/receiver
+          mkdir -p app/src/main/java/com/custom/smartwallpaper/ui
+          mkdir -p app/src/main/java/com/custom/smartwallpaper/ui/views
+          
+          # استخراج كود الجافا الصافي فقط وتجنب لمس الـ Manifest المعطوب برمجياً
+          python3 -c '
+import os, re
+if os.path.exists("SmartWallpaper_Source.txt"):
+    with open("SmartWallpaper_Source.txt", "r", encoding="utf-8") as f: content = f.read()
+    def save(p, path):
+        m = re.search(p, content, re.DOTALL)
+        if m:
+            with open(path, "w", encoding="utf-8") as out: out.write(m.group(1).strip())
+    save(r"2\. FILE: AutomationReceiver\.java.*?\n(package com\.custom\.smartwallpaper\.receiver;.*?^})", "app/src/main/java/com/custom/smartwallpaper/receiver/AutomationReceiver.java")
+    save(r"3\. FILE: SmartWallpaperService\.java.*?\n(package com\.custom\.smartwallpaper\.service;.*?^})", "app/src/main/java/com/custom/smartwallpaper/service/SmartWallpaperService.java")
+    save(r"4\. FILE: AdvancedWallpaperRenderer\.java.*?\n(package com\.custom\.smartwallpaper\.service;.*?^})", "app/src/main/java/com/custom/smartwallpaper/service/AdvancedWallpaperRenderer.java")
+    save(r"5\. FILE: PreviewEditorActivity\.java.*?\n(package com\.custom\.smartwallpaper\.ui;.*?^})", "app/src/main/java/com/custom/smartwallpaper/ui/PreviewEditorActivity.java")
+    save(r"6\. FILE: ExecuteCommandHandlerActivity\.java.*?\n(package com\.custom\.smartwallpaper\.ui;.*?^})", "app/src/main/java/com/custom/smartwallpaper/ui/ExecuteCommandHandlerActivity.java")
+    save(r"7\. FILE: DebuggerActivity\.java.*?\n(package com\.custom\.smartwallpaper\.ui;.*?^})", "app/src/main/java/com/custom/smartwallpaper/ui/DebuggerActivity.java")
+    save(r"8\. FILE: AppSettingsActivity\.java.*?\n(package com\.custom\.smartwallpaper\.ui;.*?^})", "app/src/main/java/com/custom/smartwallpaper/ui/AppSettingsActivity.java")
+    save(r"9\. FILE: GridOverlayView\.java.*?\n(package com\.custom\.smartwallpaper\.ui\.views;.*?^})", "app/src/main/java/com/custom/smartwallpaper/ui/views/GridOverlayView.java")
+          '
+
       - name: Force Gradle Wrapper Injection
         run: |
           gradle wrapper --gradle-version 8.5
@@ -24,5 +50,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: SmartWallpaper-v1-APK
-          path: "**/outputs/**/*.apk"
+          path: "app/build/outputs/apk/debug/*.apk"
           if-no-files-found: error
