@@ -18,11 +18,11 @@ jobs:
           chmod +x gradlew
 
       - name: Build Production Debug APK
-        run: ./gradlew assembleDebug --no-daemon || echo "Bypassing errors"
+        run: ./gradlew assembleDebug --no-daemon
 
       - name: Upload Finished APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: SmartWallpaper-v1-APK
-          path: "app/build/outputs/apk/debug/*.apk"
-          if-no-files-found: warn
+          path: "**/outputs/**/*.apk"
+          if-no-files-found: error
