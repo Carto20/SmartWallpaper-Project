@@ -4,18 +4,70 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'zulu'
+
+      - name: Inject Production Manifest and Resources
+        run: |
+          mkdir -p app/src/main/res/xml
+          mkdir -p app/src/main/res/values
+          mkdir -p app/src/main/res/layout
+
+          # السيرفر سيقوم بكتابة ملف المانيفست النظيف هندسياً بدون لمس شاشة الهاتف
+          cat << 'MANIFEST' > app/src/main/AndroidManifest.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://android.com">
+              <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+              <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+              <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+              <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+              <application
+                  android:allowBackup="true"
+                  android:label="Smart Automation Wallpaper"
+                  android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+                  <activity android:name="com.custom.smartwallpaper.ui.MainActivity" android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+                  <activity android:name="com.custom.smartwallpaper.ui.ExecuteCommandHandlerActivity" android:exported="true" />
+                  <activity android:name="com.custom.smartwallpaper.ui.PreviewEditorActivity" android:exported="true" />
+                  <activity android:name="com.custom.smartwallpaper.ui.DebuggerActivity" android:exported="true" />
+                  <activity android:name="com.custom.smartwallpaper.ui.AppSettingsActivity" android:exported="true" />
+                  <service
+                      android:name="com.custom.smartwallpaper.service.SmartWallpaperService"
+                      android:permission="android.permission.BIND_WALLPAPER"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.service.wallpaper.WallpaperService" />
+                      </intent-filter>
+                      <meta-data
+                          android:name="android.service.wallpaper"
+                          android:resource="@xml/wallpaper" />
+                  </service>
+                  <receiver android:name="com.custom.smartwallpaper.receiver.AutomationReceiver" android:exported="true">
+                      <intent-filter>
+                          <action android:name="com.custom.smartwallpaper.CONTROL" />
+                      </intent-filter>
+                  </receiver>
+              </application>
+          </manifest>
+          MANIFEST
+
       - name: Force Gradle Wrapper Injection
         run: |
           gradle wrapper --gradle-version 8.5
           chmod +x gradlew
+
       - name: Build Production Debug APK
         run: ./gradlew assembleDebug --no-daemon
+
       - name: Upload Finished APK Artifact
         uses: actions/upload-artifact@v4
         with:
