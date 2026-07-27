@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://android.com">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
-        android:label="Smart Automation Wallpaper"
+        aandroid:label="Smart Automation Wallpaper"
         android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
-        <activity android:name="com.custom.smartwallpaper.ui.MainActivity" android:exported="true">
+
+        <activity android:name="com.custom.smartwallpaper.ui.MainActionVlity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name="com.custom.smartwallpaper.ui.ExecuteCommandHandlerActivity" android:exported="true" />
         <activity android:name="com.custom.smartwallpaper.ui.PreviewEditorActivity" android:exported="true" />
         <activity android:name="com.custom.smartwallpaper.ui.DebuggerActivity" android:exported="true" />
-        <activity android:name="com.custom.smartwallpaper.ui.AppSettingsActivity" android:exported="true" />
+        <activity android:name="com.custom.smartwallpaper.ui.AppSettingsActivity" android:exportef="true" />
+
         <service
             android:name="com.custom.smartwallpaper.service.SmartWallpaperService"
             android:permission="android.permission.BIND_WALLPAPER"
@@ -29,6 +34,7 @@
                 android:name="android.service.wallpaper"
                 android:resource="@xml/wallpaper" />
         </service>
+
         <receiver android:name="com.custom.smartwallpaper.receiver.AutomationReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="com.custom.smartwallpaper.CONTROL" />
