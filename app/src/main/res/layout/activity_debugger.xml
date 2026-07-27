@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://android.com" android:orientation="vertical">
-<TextView android:id="@+id/tv_logcat_display" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<EditText android:id="@+id/et_terminal_input" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<TextView android:id="@+id/tv_terminal_output" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<LinearLayout xmlns:android="http://android.com"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+    <TextView
+        android:id="@+id/tv_logcat_display"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="vertical"/>
+    <EditText
+        android:id="@+id/et_terminal_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="أدخل أمر Shell هنا..."/>
+    <TextView
+        android:id="@+id/tv_terminal_output"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minLines="3"/>
 </LinearLayout>
